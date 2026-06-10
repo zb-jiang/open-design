@@ -103,6 +103,13 @@ export function renderDesignSystemShowcase(id: string, raw: string): string {
 
   const accentFg = pickReadableForeground(accent);
   const accent2Fg = pickReadableForeground(accent2);
+  const flatColorOnly = /不使用任何渐变|任何形式的渐变|不使用渐变|no gradients?|flat colors? only/i.test(raw);
+  const accentFill = flatColorOnly
+    ? 'var(--accent)'
+    : 'linear-gradient(135deg, var(--accent), var(--accent-2))';
+  const accentTextRule = flatColorOnly
+    ? 'font-style: normal; background: none; -webkit-background-clip: initial; background-clip: initial; color: var(--accent);'
+    : 'font-style: normal; background: linear-gradient(120deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent;';
 
   const productName = title;
   const tagline = oneLine(subtitle).slice(0, 120);
@@ -156,7 +163,7 @@ export function renderDesignSystemShowcase(id: string, raw: string): string {
     .brand { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 700; font-size: 17px; letter-spacing: -0.01em; }
     .brand-mark {
       width: 26px; height: 26px; border-radius: 7px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      background: ${accentFill};
     }
     .nav-links { display: flex; gap: 22px; font-size: 14px; color: var(--muted); }
     .nav-links a:hover { color: var(--fg); }
@@ -188,7 +195,7 @@ export function renderDesignSystemShowcase(id: string, raw: string): string {
       max-width: 18ch;
       font-weight: 700;
     }
-    .hero h1 em { font-style: normal; background: linear-gradient(120deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero h1 em { ${accentTextRule} }
     .hero p.lede {
       font-size: 19px; color: var(--muted);
       max-width: 56ch; margin: 0 0 36px;
@@ -229,7 +236,7 @@ export function renderDesignSystemShowcase(id: string, raw: string): string {
     }
     .feature-icon {
       width: 36px; height: 36px; border-radius: 8px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      background: ${accentFill};
       color: var(--accent-fg);
       display: inline-flex; align-items: center; justify-content: center;
       font-size: 18px; font-weight: 700;
@@ -303,7 +310,7 @@ export function renderDesignSystemShowcase(id: string, raw: string): string {
     .quote { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 26px; display: flex; flex-direction: column; gap: 18px; }
     .quote p { font-size: 17px; line-height: 1.55; margin: 0; font-family: var(--display); letter-spacing: -0.01em; }
     .quote-author { display: flex; align-items: center; gap: 12px; }
-    .quote-author .avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+    .quote-author .avatar { width: 36px; height: 36px; border-radius: 50%; background: ${accentFill}; }
     .quote-author .name { font-weight: 600; font-size: 13.5px; }
     .quote-author .role { font-size: 12.5px; color: var(--muted); }
 
@@ -317,7 +324,7 @@ export function renderDesignSystemShowcase(id: string, raw: string): string {
     /* CTA */
     .cta {
       margin: 48px 0 96px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      background: ${accentFill};
       color: var(--accent-fg);
       border-radius: 24px;
       padding: 64px 56px;

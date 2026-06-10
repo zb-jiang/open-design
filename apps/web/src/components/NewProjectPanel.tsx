@@ -1,4 +1,5 @@
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createTabToTracking } from '@open-design/contracts/analytics';
 import { isOpenDesignHostAvailable, pickHostWorkingDir } from '@open-design/host';
 import type { OpenDesignHostProjectImportSuccess } from '@open-design/host';
@@ -1124,7 +1125,10 @@ function PlatformPicker({
   const t = useT();
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const popoverRef = useRef<HTMLDivElement | null>(null);
   const listboxId = useId();
+  const [anchor, setAnchor] = useState<{ top: number; left: number; width: number; maxHeight: number } | null>(null);
 
   function togglePlatform(next: NewProjectPlatform) {
     const active = value.includes(next);
@@ -1138,6 +1142,7 @@ function PlatformPicker({
     if (!open) return;
     function onPointer(e: MouseEvent) {
       if (wrapRef.current?.contains(e.target as Node)) return;
+      if (popoverRef.current?.contains(e.target as Node)) return;
       setOpen(false);
     }
     function onKey(e: KeyboardEvent) {
@@ -1157,6 +1162,31 @@ function PlatformPicker({
     };
   }, [open]);
 
+  useLayoutEffect(() => {
+    if (!open || !triggerRef.current) return undefined;
+    function updateAnchor() {
+      const trigger = triggerRef.current;
+      if (!trigger) return;
+      const rect = trigger.getBoundingClientRect();
+      const gap = 6;
+      const margin = 12;
+      const spaceBelow = window.innerHeight - rect.bottom - gap - margin;
+      setAnchor({
+        top: rect.bottom + gap,
+        left: rect.left,
+        width: rect.width,
+        maxHeight: Math.max(220, Math.min(420, spaceBelow)),
+      });
+    }
+    updateAnchor();
+    window.addEventListener('resize', updateAnchor);
+    window.addEventListener('scroll', updateAnchor, true);
+    return () => {
+      window.removeEventListener('resize', updateAnchor);
+      window.removeEventListener('scroll', updateAnchor, true);
+    };
+  }, [open]);
+
   const primary = DESIGN_PLATFORMS.find((o) => o.value === value[0]) ?? null;
   const extraCount = Math.max(0, value.length - 1);
 
@@ -1168,6 +1198,7 @@ function PlatformPicker({
       <label className="newproj-label">Target platforms</label>
       <button
         type="button"
+        ref={triggerRef}
         className={`ds-picker-trigger${open ? ' open' : ''}${primary ? '' : ' empty'}`}
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
@@ -1189,14 +1220,22 @@ function PlatformPicker({
           style={{ transform: open ? 'rotate(180deg)' : undefined }}
         />
       </button>
-      {open ? (
-        <div
-          className="ds-picker-popover"
-          id={listboxId}
-          role="listbox"
-          aria-label="Target platforms"
-          aria-multiselectable="true"
-        >
+      {open && anchor && typeof document !== 'undefined'
+        ? createPortal(
+          <div
+            ref={popoverRef}
+            className="ds-picker-popover ds-picker-popover--fixed"
+            id={listboxId}
+            role="listbox"
+            aria-label="Target platforms"
+            aria-multiselectable="true"
+            style={{
+              top: anchor.top,
+              left: anchor.left,
+              width: anchor.width,
+              maxHeight: anchor.maxHeight,
+            }}
+          >
           <div className="ds-picker-list">
             {DESIGN_PLATFORMS.map((option) => {
               const active = value.includes(option.value);
@@ -1223,8 +1262,10 @@ function PlatformPicker({
               );
             })}
           </div>
-        </div>
-      ) : null}
+        </div>,
+        document.body,
+      )
+      : null}
     </div>
   );
 }
@@ -1663,7 +1704,10 @@ function PromptTemplatePicker({
   const [lastFailedPick, setLastFailedPick] =
     useState<PromptTemplateSummary | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const popoverRef = useRef<HTMLDivElement | null>(null);
   const searchRef = useRef<HTMLInputElement | null>(null);
+  const [anchor, setAnchor] = useState<{ top: number; left: number; width: number; maxHeight: number } | null>(null);
 
   const surfaceScoped = useMemo(
     () => templates.filter((tpl) => tpl.surface === surface),
@@ -1693,6 +1737,7 @@ function PromptTemplatePicker({
     if (!open) return;
     function onPointer(e: MouseEvent) {
       if (wrapRef.current?.contains(e.target as Node)) return;
+      if (popoverRef.current?.contains(e.target as Node)) return;
       setOpen(false);
     }
     function onKey(e: KeyboardEvent) {
@@ -1706,6 +1751,31 @@ function PromptTemplatePicker({
       window.clearTimeout(id);
       document.removeEventListener('mousedown', onPointer);
       document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  useLayoutEffect(() => {
+    if (!open || !triggerRef.current) return undefined;
+    function updateAnchor() {
+      const trigger = triggerRef.current;
+      if (!trigger) return;
+      const rect = trigger.getBoundingClientRect();
+      const gap = 6;
+      const margin = 12;
+      const spaceBelow = window.innerHeight - rect.bottom - gap - margin;
+      setAnchor({
+        top: rect.bottom + gap,
+        left: rect.left,
+        width: rect.width,
+        maxHeight: Math.max(220, Math.min(420, spaceBelow)),
+      });
+    }
+    updateAnchor();
+    window.addEventListener('resize', updateAnchor);
+    window.addEventListener('scroll', updateAnchor, true);
+    return () => {
+      window.removeEventListener('resize', updateAnchor);
+      window.removeEventListener('scroll', updateAnchor, true);
     };
   }, [open]);
 
@@ -1754,6 +1824,7 @@ function PromptTemplatePicker({
       <button
         type="button"
         data-testid="prompt-template-trigger"
+        ref={triggerRef}
         className={`ds-picker-trigger${open ? ' open' : ''}${value ? '' : ' empty'}`}
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
@@ -1771,8 +1842,19 @@ function PromptTemplatePicker({
           style={{ transform: open ? 'rotate(180deg)' : undefined }}
         />
       </button>
-      {open ? (
-        <div className="ds-picker-popover" role="listbox">
+      {open && anchor && typeof document !== 'undefined'
+        ? createPortal(
+          <div
+            ref={popoverRef}
+            className="ds-picker-popover ds-picker-popover--fixed"
+            role="listbox"
+            style={{
+              top: anchor.top,
+              left: anchor.left,
+              width: anchor.width,
+              maxHeight: anchor.maxHeight,
+            }}
+          >
           <div className="ds-picker-head">
             <input
               ref={searchRef}
@@ -1894,8 +1976,10 @@ function PromptTemplatePicker({
               {t('newproj.promptTemplateBodyEmpty')}
             </div>
           ) : null}
-        </div>
-      ) : null}
+        </div>,
+        document.body,
+      )
+      : null}
     </div>
   );
 }
@@ -1994,7 +2078,10 @@ function DesignSystemPicker({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const popoverRef = useRef<HTMLDivElement | null>(null);
   const searchRef = useRef<HTMLInputElement | null>(null);
+  const [anchor, setAnchor] = useState<{ top: number; left: number; width: number; maxHeight: number } | null>(null);
 
   const byId = useMemo(() => {
     const map = new Map<string, DesignSystemSummary>();
@@ -2035,6 +2122,31 @@ function DesignSystemPicker({
     });
   }, [ordered, query]);
 
+  useLayoutEffect(() => {
+    if (!open || !triggerRef.current) return undefined;
+    function updateAnchor() {
+      const trigger = triggerRef.current;
+      if (!trigger) return;
+      const rect = trigger.getBoundingClientRect();
+      const gap = 6;
+      const margin = 12;
+      const spaceBelow = window.innerHeight - rect.bottom - gap - margin;
+      setAnchor({
+        top: rect.bottom + gap,
+        left: rect.left,
+        width: rect.width,
+        maxHeight: Math.max(220, Math.min(420, spaceBelow)),
+      });
+    }
+    updateAnchor();
+    window.addEventListener('resize', updateAnchor);
+    window.addEventListener('scroll', updateAnchor, true);
+    return () => {
+      window.removeEventListener('resize', updateAnchor);
+      window.removeEventListener('scroll', updateAnchor, true);
+    };
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
     const t = window.setTimeout(() => searchRef.current?.focus(), 30);
@@ -2045,6 +2157,7 @@ function DesignSystemPicker({
     if (!open) return;
     function onPointer(e: MouseEvent) {
       if (wrapRef.current?.contains(e.target as Node)) return;
+      if (popoverRef.current?.contains(e.target as Node)) return;
       setOpen(false);
     }
     function onKey(e: KeyboardEvent) {
@@ -2106,6 +2219,7 @@ function DesignSystemPicker({
       <button
         type="button"
         data-testid="design-system-trigger"
+        ref={triggerRef}
         className={`ds-picker-trigger${open ? ' open' : ''}${primary ? '' : ' empty'}`}
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
@@ -2134,8 +2248,19 @@ function DesignSystemPicker({
           style={{ transform: open ? 'rotate(180deg)' : undefined }}
         />
       </button>
-      {open ? (
-        <div className="ds-picker-popover" role="listbox">
+      {open && anchor && typeof document !== 'undefined'
+        ? createPortal(
+          <div
+            ref={popoverRef}
+            className="ds-picker-popover ds-picker-popover--fixed"
+            role="listbox"
+            style={{
+              top: anchor.top,
+              left: anchor.left,
+              width: anchor.width,
+              maxHeight: anchor.maxHeight,
+            }}
+          >
           <div className="ds-picker-head">
             <input
               ref={searchRef}
@@ -2227,8 +2352,10 @@ function DesignSystemPicker({
               </button>
             </div>
           ) : null}
-        </div>
-      ) : null}
+        </div>,
+        document.body,
+      )
+      : null}
     </div>
   );
 }

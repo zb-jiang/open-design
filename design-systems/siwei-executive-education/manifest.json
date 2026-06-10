@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "od-design-system-project/v1",
+  "id": "siwei-executive-education",
+  "name": "四为高管教育",
+  "category": "Company Brand",
+  "description": "基于四为高管教育 VI、字体、色彩和 PPT 模板沉淀的多场景品牌设计体系。",
+  "source": {
+    "type": "local",
+    "origin": "company-vi-and-ppt-template"
+  },
+  "files": {
+    "design": "DESIGN.md",
+    "tokens": "tokens.css"
+  },
+  "usage": "USAGE.md",
+  "assetsDir": "assets",
+  "sourceFiles": {
+    "evidence": "source/evidence.md"
+  }
+}

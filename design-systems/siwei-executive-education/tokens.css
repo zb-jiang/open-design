@@ -1,0 +1,43 @@
+:root {
+  --siwei-red: #E60012;
+  --siwei-black: #080404;
+  --siwei-white: #FFFFFF;
+  --siwei-blue: #436DB4;
+  --siwei-blue-700: #365A98;
+  --siwei-blue-300: #6C91CC;
+  --siwei-blue-100: #C8D4E8;
+
+  --brand-primary: var(--siwei-red);
+  --brand-secondary: var(--siwei-black);
+  --brand-accent: var(--siwei-red);
+  --brand-support: var(--siwei-blue);
+  --accent: var(--siwei-red);
+  --background: #FFFFFF;
+  --surface: #F7F8FA;
+  --surface-strong: #F1F3F6;
+  --text-primary: #080404;
+  --text-secondary: #4B5563;
+  --text-muted: #7A808A;
+  --border: #E5E7EB;
+  --success: #1F8A5B;
+  --warning: #D97706;
+  --danger: #E60012;
+
+  --font-zh: "思源黑体", "Source Han Sans SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+  --font-en: "Roboto", "Inter", "Segoe UI", Arial, sans-serif;
+  --font-sans: var(--font-zh);
+
+  --slide-width: 1280px;
+  --slide-height: 720px;
+  --slide-margin-x: 60px;
+  --slide-margin-top: 60px;
+  --slide-margin-bottom: 40px;
+  --grid-baseline: 40px;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --shadow-card: 0 12px 32px rgba(8, 4, 4, 0.08);
+  --shadow-soft: 0 8px 24px rgba(67, 109, 180, 0.12);
+}
