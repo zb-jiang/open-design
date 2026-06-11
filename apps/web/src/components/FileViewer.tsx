@@ -63,6 +63,7 @@ import type { ProjectFilePreview } from '../providers/registry';
 import {
   downloadImageDataUrl,
   exportAsJsx,
+  exportAsLongImage,
   exportAsMd,
   exportAsPdf,
   exportProjectAsHtml,
@@ -4458,6 +4459,7 @@ function HtmlViewer({
       | 'zip'
       | 'html'
       | 'image'
+      | 'long-image'
       | 'markdown'
       | 'template'
       | 'share_link'
@@ -7345,7 +7347,11 @@ function HtmlViewer({
     setImageExportPreparedBlob(null);
     imageExportSnapshotDataUrlRef.current = null;
     setImageExportModalOpen(true);
-    void prepareImageExportBlob(imageExportFormat);
+    // Wait a frame for the dropdown menu to close before capturing,
+    // otherwise the menu may still be visible in the snapshot.
+    requestAnimationFrame(() => {
+      void prepareImageExportBlob(imageExportFormat);
+    });
   };
 
   const changeImageExportFormat = (format: ImageExportFormat) => {
@@ -8366,6 +8372,22 @@ function HtmlViewer({
                     >
                       <span className="share-menu-icon"><RemixIcon name="image-line" size={15} /></span>
                       <span>{t('fileViewer.exportImage')}</span>
+                    </button>
+                  ) : null}
+                  {effectiveDeck && showImageExport ? (
+                    <button
+                      type="button"
+                      className="share-menu-item"
+                      role="menuitem"
+                      onClick={() => {
+                      setDownloadMenuOpen(false);
+                      fireShareExport('long-image', () => exportAsLongImage(source ?? '', exportTitle, {
+                        baseHref: projectRawUrl(projectId, baseDirFor(file.name)),
+                      }));
+                    }}
+                    >
+                      <span className="share-menu-icon"><RemixIcon name="image-2-line" size={15} /></span>
+                      <span>导出长图</span>
                     </button>
                   ) : null}
                   <button

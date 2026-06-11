@@ -89,6 +89,8 @@ export type OpenDesignHostCaptureClip = { x: number; y: number; width: number; h
 export type OpenDesignHostCaptureOptions = { clip?: OpenDesignHostCaptureClip };
 export type OpenDesignHostCaptureSuccess = { dataUrl: string; h: number; ok: true; w: number };
 export type OpenDesignHostCaptureResult = OpenDesignHostCaptureSuccess | OpenDesignHostFailure;
+export type OpenDesignHostLongImageSuccess = { images: string[]; ok: true; width: number; height: number };
+export type OpenDesignHostLongImageResult = OpenDesignHostLongImageSuccess | OpenDesignHostFailure;
 
 export type OpenDesignHostBrowserClearDataOptions = {
   cookies?: boolean;
@@ -236,6 +238,7 @@ export type OpenDesignHostBridge = {
   };
   capture: {
     page(options?: OpenDesignHostCaptureOptions): Promise<OpenDesignHostCaptureResult>;
+    longImage(doc: string): Promise<OpenDesignHostLongImageResult>;
   };
   client: OpenDesignHostClient;
   pdf: {
@@ -550,6 +553,19 @@ export async function printHostPdf(
   if (host == null) return unavailable("Open Design host is not available");
   try {
     return await host.pdf.print(html, nonce, options);
+  } catch (error) {
+    return unavailable(error instanceof Error ? error.message : String(error));
+  }
+}
+
+export async function captureHostLongImage(
+  doc: string,
+  scope: OpenDesignHostGlobalScope = globalThis,
+): Promise<OpenDesignHostLongImageResult> {
+  const host = getOpenDesignHost(scope);
+  if (host == null) return unavailable("Open Design host is not available");
+  try {
+    return await host.capture.longImage(doc);
   } catch (error) {
     return unavailable(error instanceof Error ? error.message : String(error));
   }

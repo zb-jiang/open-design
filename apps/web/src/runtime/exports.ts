@@ -17,6 +17,7 @@ import { buildReactComponentSrcdoc } from './react-component';
 import { buildZip } from './zip';
 import { randomUUID } from '../utils/uuid';
 import {
+  captureHostLongImage,
   captureHostPage,
   isOpenDesignHostAvailable,
   printHostPdf,
@@ -727,6 +728,85 @@ export function exportAsImage(dataUrl: string, title: string): void {
   }
 }
 
+/** Stitch multiple slide screenshots into a single vertical long image. */
+async function stitchImagesToLongImage(
+  images: string[],
+  slideWidth: number,
+  slideHeight: number,
+): Promise<string> {
+  const canvas = document.createElement('canvas');
+  canvas.width = slideWidth;
+  canvas.height = slideHeight * images.length;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Could not get canvas 2d context');
+
+  for (let i = 0; i < images.length; i++) {
+    const image = images[i];
+    if (!image) continue;
+    const img = await loadImageFromDataUrl(image);
+    ctx.drawImage(img, 0, slideHeight * i, slideWidth, slideHeight);
+  }
+
+  return canvas.toDataURL('image/png');
+}
+
+/** Export a deck as a single vertical long image (one slide per row). */
+export async function exportAsLongImage(
+  source: string,
+  title: string,
+  options: { baseHref?: string } = {},
+): Promise<void> {
+  // Resolve relative baseHref to absolute URL so that <base href="...">
+  // works inside the data:text/html context used by the capture window.
+  let baseHref = options.baseHref;
+  if (baseHref && !/^https?:\/\//i.test(baseHref) && typeof window !== 'undefined') {
+    baseHref = new URL(baseHref, window.location.origin).toString();
+  }
+  let doc = buildSrcdoc(source, { baseHref });
+  // Hide slide numbers / page indicators in the long image export.
+  // Use a broad approach: inject a <style> before </head> if present,
+  // otherwise append to <head>, otherwise prepend to document.
+  const hidePageNumbersStyle = '<style data-od-long-image-hide>.slide-number,.xw-page,.xp-page,.page-dot,.ts-page,.dk-snum,.oc-snum,.gd-snum,.pageno,.dk-page,.deck-counter,.deck-hint,.deck-progress,.progress-bar{display:none!important}[data-current][data-total]::before,[data-current][data-total]::after{content:none!important}.deck-footer>span:last-child,.xw-footer>span:last-child,.xp-footer>span:last-child,.ts-footer>span:last-child,.kb-footer>span:last-child,.hc-footer>span:last-child{display:none!important}</style>';
+  {
+    const lower = doc.toLowerCase();
+    const bodyStart = lower.indexOf('<body');
+    const limit = bodyStart >= 0 ? bodyStart : lower.length;
+    const headEndIdx = lower.lastIndexOf('</head>', limit - 1);
+    if (headEndIdx >= 0) {
+      doc = doc.slice(0, headEndIdx) + hidePageNumbersStyle + doc.slice(headEndIdx);
+    } else if (/<head[^>]*>/i.test(doc)) {
+      doc = doc.replace(/<head[^>]*>/i, (m) => `${m}${hidePageNumbersStyle}`);
+    } else {
+      doc = hidePageNumbersStyle + doc;
+    }
+  }
+  const target = await prepareImageExportTarget(title, 'png');
+
+  if (!isOpenDesignHostAvailable()) {
+    throw new Error('Long image export requires the Open Design desktop app.');
+  }
+
+  const result = await captureHostLongImage(doc);
+  if (!result.ok) {
+    throw new Error(result.reason ?? 'Long image capture failed');
+  }
+
+  const longImageDataUrl = await stitchImagesToLongImage(
+    result.images,
+    result.width,
+    result.height,
+  );
+
+  if (target == null) {
+    downloadImageDataUrl(longImageDataUrl, `${safeFilename(title, 'artifact')}-long.png`);
+  } else if (target.method === 'download') {
+    downloadImageDataUrl(longImageDataUrl, `${target.filename}-long.png`);
+  } else if (target.method === 'picker') {
+    const blob = dataUrlToBlob(longImageDataUrl);
+    await target.save(blob);
+  }
+}
+
 export type ProjectPdfExportResult = 'desktop' | 'fallback';
 
 export async function exportProjectAsPdf(opts: {
@@ -1045,12 +1125,11 @@ function injectParentPrintReadyCache(doc: string, nonce: string): string {
 // `overflow: hidden` for on-screen swiping.
 const DECK_PRINT_CSS = `
 @media print {
-  @page { size: 1920px 1080px; margin: 0; }
+  @page { margin: 0; }
   html, body {
-    width: 1920px !important;
+    width: auto !important;
     height: auto !important;
     overflow: visible !important;
-    background: #fff !important;
   }
   body {
     display: block !important;
@@ -1059,10 +1138,6 @@ const DECK_PRINT_CSS = `
   }
   .slide, [data-screen-label], section.slide, .deck-slide, .ppt-slide {
     flex: none !important;
-    width: 1920px !important;
-    height: 1080px !important;
-    min-height: 1080px !important;
-    max-height: 1080px !important;
     page-break-after: always;
     break-after: page;
     scroll-snap-align: none !important;

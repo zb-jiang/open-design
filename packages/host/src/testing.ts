@@ -46,6 +46,7 @@ function defaultHost(): OpenDesignHostBridge {
     },
     capture: {
       page: async () => ({ ok: true, dataUrl: "data:image/png;base64,", h: 1, w: 1 }),
+      longImage: async () => ({ ok: true, images: [], width: 1280, height: 720 }),
     },
     client: {
       type: "desktop",

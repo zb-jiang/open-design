@@ -1925,8 +1925,10 @@ function PromptTemplatePicker({
               })
             )}
           </div>
-        </div>
-      ) : null}
+        </div>,
+        document.body,
+      )
+      : null}
       {error ? (
         <div
           className="prompt-template-error"
@@ -1976,10 +1978,8 @@ function PromptTemplatePicker({
               {t('newproj.promptTemplateBodyEmpty')}
             </div>
           ) : null}
-        </div>,
-        document.body,
-      )
-      : null}
+        </div>
+      ) : null}
     </div>
   );
 }

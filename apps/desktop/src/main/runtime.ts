@@ -15,7 +15,7 @@ import {
   type DesktopExportPdfResult,
   type DesktopUpdateStatusSnapshot,
 } from "@open-design/sidecar-proto";
-import type { OpenDesignHostActionResult, OpenDesignHostCaptureResult, OpenDesignHostUpdaterActionOptions } from "@open-design/host";
+import type { OpenDesignHostActionResult, OpenDesignHostCaptureResult, OpenDesignHostLongImageResult, OpenDesignHostUpdaterActionOptions } from "@open-design/host";
 
 import { openValidatedDirectory } from "./open-path.js";
 import { createElectronPdfTarget, exportPdfFromHtml, savePrintReadyDocumentAsPdf } from "./pdf-export.js";
@@ -1689,6 +1689,107 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
       return { ok: true, dataUrl: image.toDataURL(), w: size.width, h: size.height };
     } catch (error) {
       return { ok: false, reason: error instanceof Error ? error.message : String(error) };
+    }
+  });
+
+  ipcMain.removeHandler('od:capture-long-image');
+  ipcMain.handle('od:capture-long-image', async (event, doc: unknown): Promise<OpenDesignHostLongImageResult> => {
+    if (event.sender !== window.webContents) {
+      return { ok: false, reason: 'capture sender not allowed' };
+    }
+    if (typeof doc !== 'string') {
+      return { ok: false, reason: 'Invalid long-image payload: expected HTML string' };
+    }
+    const captureWindow = new BrowserWindow({
+      height: 900,
+      show: false,
+      webPreferences: {
+        contextIsolation: true,
+        nodeIntegration: false,
+        sandbox: true,
+      },
+      width: 1440,
+    });
+    try {
+      await captureWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(doc)}`);
+      await new Promise<void>((resolve) => setTimeout(resolve, 500));
+      // Remove slide numbers / page indicators before capturing.
+      await captureWindow.webContents.executeJavaScript(
+        `(() => {
+          // Remove known page-number elements and deck chrome
+          document.querySelectorAll('.slide-number,.xw-page,.xp-page,.page-dot,.ts-page,.dk-snum,.oc-snum,.gd-snum,.pageno,.dk-page,.deck-counter,.deck-hint,.deck-progress,.progress-bar').forEach(function(el){ el.remove(); });
+          // Remove data attributes used by ::before/::after pseudo-elements
+          document.querySelectorAll('[data-current][data-total]').forEach(function(el){ el.removeAttribute('data-current'); el.removeAttribute('data-total'); });
+          // Remove last span in footer classes (page numbers without dedicated class)
+          document.querySelectorAll('.deck-footer,.xw-footer,.xp-footer,.ts-footer,.kb-footer,.hc-footer').forEach(function(footer){
+            var spans = footer.querySelectorAll('span');
+            if (spans.length >= 2) {
+              var last = spans[spans.length - 1];
+              var t = (last.textContent || '').trim();
+              if (/^\\d{1,3}\\s*[/·\\-]\\s*\\d{1,3}$/.test(t) || /^(cover|end|fin|\\d{1,3})$/i.test(t)) last.remove();
+            }
+          });
+          // Re-apply on each slide switch
+          window.__odRemovePageNumbers = function() {
+            document.querySelectorAll('.slide-number,.xw-page,.xp-page,.page-dot,.ts-page,.dk-snum,.oc-snum,.gd-snum,.pageno,.dk-page,.deck-counter,.deck-hint,.deck-progress,.progress-bar').forEach(function(el){ el.remove(); });
+            document.querySelectorAll('[data-current][data-total]').forEach(function(el){ el.removeAttribute('data-current'); el.removeAttribute('data-total'); });
+            document.querySelectorAll('.deck-footer,.xw-footer,.xp-footer,.ts-footer,.kb-footer,.hc-footer').forEach(function(footer){
+              var spans = footer.querySelectorAll('span');
+              if (spans.length >= 2) {
+                var last = spans[spans.length - 1];
+                var t = (last.textContent || '').trim();
+                if (/^\\d{1,3}\\s*[/·\\-]\\s*\\d{1,3}$/.test(t) || /^(cover|end|fin|\\d{1,3})$/i.test(t)) last.remove();
+              }
+            });
+          };
+        })()`,
+        true,
+      );
+      const slideInfo = await captureWindow.webContents.executeJavaScript(
+        `(() => {
+          const slides = document.querySelectorAll('.slide, [data-screen-label], section.slide, .deck-slide, .ppt-slide');
+          if (slides.length === 0) return null;
+          const first = slides[0];
+          return {
+            count: slides.length,
+            width: first.offsetWidth || first.clientWidth || 1280,
+            height: first.offsetHeight || first.clientHeight || 720,
+          };
+        })()`,
+        true,
+      ) as { count: number; height: number; width: number } | null;
+      if (!slideInfo) {
+        return { ok: false, reason: 'No slides found' };
+      }
+      const images: string[] = [];
+      for (let i = 0; i < slideInfo.count; i++) {
+        await captureWindow.webContents.executeJavaScript(
+          `(() => {
+            const slides = document.querySelectorAll('.slide, [data-screen-label], section.slide, .deck-slide, .ppt-slide');
+            slides.forEach((s, idx) => {
+              if (idx === ${i}) {
+                s.style.opacity = '1';
+                s.style.visibility = 'visible';
+                s.style.display = '';
+              } else {
+                s.style.opacity = '0';
+                s.style.visibility = 'hidden';
+                s.style.display = 'none';
+              }
+            });
+            if (typeof window.__odRemovePageNumbers === 'function') window.__odRemovePageNumbers();
+          })()`,
+          true,
+        );
+        await new Promise<void>((resolve) => setTimeout(resolve, 150));
+        const image = await captureWindow.webContents.capturePage();
+        images.push(image.toDataURL());
+      }
+      return { ok: true, images, width: slideInfo.width, height: slideInfo.height };
+    } catch (error) {
+      return { ok: false, reason: error instanceof Error ? error.message : String(error) };
+    } finally {
+      captureWindow.destroy();
     }
   });
 

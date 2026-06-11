@@ -271,7 +271,8 @@ Template：具体 PPT / 海报 / 官网页面结构模板（每页版式、标�
 ### 7.1 构建可运行目录（不生成安装包）
 
 ```powershell
-pnpm tools-pack win build --namespace dev --to dir --json
+$env:ELECTRON_MIRROR = 'https://npmmirror.com/mirrors/electron/'
+pnpm tools-pack win build --namespace dev --to dir --json 2>&1 | Tee-Object -FilePath D:\works\open-design\build-log.txt
 ```
 
 构建产物在：

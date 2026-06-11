@@ -7,6 +7,7 @@ import type {
   OpenDesignHostCaptureOptions,
   OpenDesignHostCaptureResult,
   OpenDesignHostFailure,
+  OpenDesignHostLongImageResult,
   OpenDesignHostProjectImportResult,
   OpenDesignHostProjectReplaceWorkingDirResult,
   OpenDesignHostPickWorkingDirResult,
@@ -233,6 +234,13 @@ const capture = {
   page: async (options?: OpenDesignHostCaptureOptions): Promise<OpenDesignHostCaptureResult> => {
     try {
       return await ipcRenderer.invoke('od:capture-page', options ?? null);
+    } catch (error) {
+      return failure(reasonFromError(error));
+    }
+  },
+  longImage: async (doc: string): Promise<OpenDesignHostLongImageResult> => {
+    try {
+      return await ipcRenderer.invoke('od:capture-long-image', doc);
     } catch (error) {
       return failure(reasonFromError(error));
     }

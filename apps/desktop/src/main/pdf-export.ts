@@ -5,7 +5,7 @@ import type { DesktopExportPdfInput, DesktopExportPdfResult } from "@open-design
 
 type PageSize = { height: number; width: number };
 
-const DECK_PAGE_SIZE: PageSize = { width: 13.333333, height: 7.5 };
+const DEFAULT_DECK_PAGE_SIZE: PageSize = { width: 13.333333, height: 7.5 };
 const MAX_PAGE_INCHES = 200;
 
 export type PrintReadyPdfOptions = {
@@ -21,12 +21,11 @@ type PrintToPdfOptions = {
 
 const DECK_PRINT_CSS = `
 @media print {
-  @page { size: 1920px 1080px; margin: 0; }
+  @page { margin: 0; }
   html, body {
-    width: 1920px !important;
+    width: auto !important;
     height: auto !important;
     overflow: visible !important;
-    background: #fff !important;
   }
   body {
     display: block !important;
@@ -35,10 +34,6 @@ const DECK_PRINT_CSS = `
   }
   .slide, [data-screen-label], section.slide, .deck-slide, .ppt-slide {
     flex: none !important;
-    width: 1920px !important;
-    height: 1080px !important;
-    min-height: 1080px !important;
-    max-height: 1080px !important;
     page-break-after: always;
     break-after: page;
     scroll-snap-align: none !important;
@@ -66,20 +61,20 @@ export async function exportPdfFromHtml(input: DesktopExportPdfInput): Promise<D
   if (save.canceled || !save.filePath) return { canceled: true, ok: true };
 
   const window = new BrowserWindow({
-    height: input.deck ? 1080 : 900,
+    height: 900,
     show: false,
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
     },
-    width: input.deck ? 1920 : 1440,
+    width: 1440,
   });
 
   try {
     await window.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(buildPrintableDocument(input))}`);
     await waitForPrintableContent(window);
-    const pageSize = input.deck ? DECK_PAGE_SIZE : await inferPageSize(window);
+    const pageSize = input.deck ? await inferDeckPageSize(window) : await inferPageSize(window);
     const pdf = await window.webContents.printToPDF(printToPdfOptions(pageSize));
     await writeFile(save.filePath, pdf);
     return { ok: true, path: save.filePath };
@@ -123,6 +118,8 @@ export type PrintReadyPdfTarget = {
   waitUntilReady: (nonce: string) => Promise<void>;
   /** Measure non-deck content so dialogless PDFs do not fall back to Letter. */
   measurePageSize: () => Promise<PageSize>;
+  /** Measure deck slide dimensions from the first .slide element. */
+  measureDeckPageSize: () => Promise<PageSize>;
   /** Render the loaded document to PDF bytes (Electron printToPDF). */
   printToPdf: (options: PrintToPdfOptions) => Promise<Uint8Array>;
   /** Write the PDF bytes to `filePath`. */
@@ -161,7 +158,7 @@ export async function savePrintReadyDocumentAsPdf(
   try {
     await target.load(html, options);
     await target.waitUntilReady(nonce);
-    const pageSize = options.deck ? DECK_PAGE_SIZE : await target.measurePageSize();
+    const pageSize = options.deck ? await target.measureDeckPageSize() : await target.measurePageSize();
     const pdf = await target.printToPdf(printToPdfOptions(pageSize));
     await target.write(savePath, pdf);
     return { ok: true, path: savePath };
@@ -193,14 +190,14 @@ export function createElectronPdfTarget(): PrintReadyPdfTarget {
     },
     async load(html, options) {
       const printWindow = new BrowserWindow({
-        height: options.deck ? 1080 : 900,
+        height: 900,
         show: false,
         webPreferences: {
           contextIsolation: true,
           nodeIntegration: false,
           sandbox: true,
         },
-        width: options.deck ? 1920 : 1440,
+        width: 1440,
       });
       window = printWindow;
       printWindow.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
@@ -214,6 +211,10 @@ export function createElectronPdfTarget(): PrintReadyPdfTarget {
     async measurePageSize() {
       if (!window) throw new Error("PDF render window has not been loaded");
       return inferPageSize(window);
+    },
+    async measureDeckPageSize() {
+      if (!window) throw new Error("PDF render window has not been loaded");
+      return inferDeckPageSize(window);
     },
     async printToPdf(options) {
       if (!window) throw new Error("PDF render window has not been loaded");
@@ -380,6 +381,37 @@ async function inferPageSize(window: BrowserWindow): Promise<PageSize> {
     width: clamp(widthPx / 96, 1, MAX_PAGE_INCHES),
     height: clamp(heightPx / 96, 1, MAX_PAGE_INCHES),
   };
+}
+
+/** Detect the actual slide dimensions from the first .slide element.
+ *  Falls back to DEFAULT_DECK_PAGE_SIZE (1280×720 @ 96dpi) when no
+ *  slide element is found, so decks with non-standard selectors still
+ *  produce a reasonable PDF. */
+async function inferDeckPageSize(window: BrowserWindow): Promise<PageSize> {
+  const size = await window.webContents.executeJavaScript(
+    `(() => {
+      const slide = document.querySelector('.slide, [data-screen-label], section.slide, .deck-slide, .ppt-slide');
+      if (slide) {
+        const w = slide.offsetWidth || slide.clientWidth;
+        const h = slide.offsetHeight || slide.clientHeight;
+        if (w > 0 && h > 0) return { width: w, height: h };
+      }
+      // Fallback: read CSS custom properties
+      const root = document.documentElement;
+      const sw = parseInt(getComputedStyle(root).getPropertyValue('--slide-width')) || 0;
+      const sh = parseInt(getComputedStyle(root).getPropertyValue('--slide-height')) || 0;
+      if (sw > 0 && sh > 0) return { width: sw, height: sh };
+      return null;
+    })()`,
+    true,
+  ) as { height?: number; width?: number } | null;
+  if (size && typeof size.width === "number" && size.width > 0 && typeof size.height === "number" && size.height > 0) {
+    return {
+      width: clamp(size.width / 96, 1, MAX_PAGE_INCHES),
+      height: clamp(size.height / 96, 1, MAX_PAGE_INCHES),
+    };
+  }
+  return DEFAULT_DECK_PAGE_SIZE;
 }
 
 function clamp(value: number, min: number, max: number): number {
