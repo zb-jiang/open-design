@@ -7152,8 +7152,8 @@ function HtmlViewer({
     rendererId === 'html';
   const canShare = source !== null && isShareableArtifact;
   const canDownload = source !== null && (isShareableArtifact || isMarkdownArtifact);
-  const canPptx = canShare && Boolean(onExportAsPptx) && !streaming;
-  const showPptxExport = canShare;
+  const canPptx = canShare && isDeckArtifact && Boolean(onExportAsPptx) && !streaming;
+  const showPptxExport = canShare && isDeckArtifact;
   const showMarkdownExport = source !== null && isMarkdownArtifact;
   const showImageExport = canShare;
 
