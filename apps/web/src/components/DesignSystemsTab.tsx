@@ -422,15 +422,6 @@ export function DesignSystemsTab({
             >
               {t('dsManager.officialPresets')}
             </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={designSystemCollection === 'enterprise'}
-              className={designSystemCollection === 'enterprise' ? 'active' : ''}
-              onClick={() => setDesignSystemCollection('enterprise')}
-            >
-              {t('dsManager.enterprise')}
-            </button>
           </div>
         </div>
       ) : (
@@ -444,15 +435,6 @@ export function DesignSystemsTab({
               onClick={() => setTemplateCollection('mine')}
             >
               {t('dsManager.yourTemplates')}
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={templateCollection === 'enterprise'}
-              className={templateCollection === 'enterprise' ? 'active' : ''}
-              onClick={() => setTemplateCollection('enterprise')}
-            >
-              {t('dsManager.enterprise')}
             </button>
           </div>
         </div>
@@ -688,15 +670,6 @@ export function DesignSystemsTab({
         </section>
       ) : null}
 
-      {primaryCollection === 'design-system' && designSystemCollection === 'enterprise' ? (
-        <ComingSoonPanel
-          eyebrow={t('dsManager.eyebrowDesignSystems')}
-          title={t('dsManager.enterpriseDsTitle')}
-          body={t('dsManager.enterpriseDsBody')}
-          comingSoonLabel={t('dsManager.comingSoonBadge')}
-        />
-      ) : null}
-
       {primaryCollection === 'template' && templateCollection === 'mine' ? (
         <section className="ds-settings-card ds-templates-card" aria-label={t('dsManager.yourTemplatesAria')}>
           <div className="ds-settings-card__head">
@@ -725,14 +698,6 @@ export function DesignSystemsTab({
         </section>
       ) : null}
 
-      {primaryCollection === 'template' && templateCollection === 'enterprise' ? (
-        <ComingSoonPanel
-          eyebrow={t('dsManager.eyebrowTemplates')}
-          title={t('dsManager.enterpriseTplTitle')}
-          body={t('dsManager.enterpriseTplBody')}
-          comingSoonLabel={t('dsManager.comingSoonBadge')}
-        />
-      ) : null}
     </div>
   );
 }

@@ -1249,7 +1249,7 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
         }
       }
       // For "from template" projects, seed the chosen template's snapshot
-      // HTML into the new project folder so the agent can Read/edit files
+      // files into the new project folder so the agent can Read/edit files
       // on disk (the system prompt also embeds them, but a real on-disk
       // copy lets the agent treat them as the project's working state).
       if (
@@ -1270,11 +1270,15 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
               continue;
             }
             try {
+              const body =
+                f.encoding === 'base64'
+                  ? Buffer.from(f.content, 'base64')
+                  : Buffer.from(f.content, 'utf8');
               await writeProjectFile(
                 PROJECTS_DIR,
                 id,
                 f.name,
-                Buffer.from(f.content, 'utf8'),
+                body,
                 {},
                 projectMetadata,
               );
@@ -1758,15 +1762,20 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
       if (!sourceProject) {
         return res.status(404).json({ error: 'source project not found' });
       }
-      // Snapshot every HTML / sketch / text file in the source project.
-      // We deliberately skip binary uploads — templates are about the
-      // generated design, not the user's reference imagery.
+      // Snapshot every HTML / sketch / text / image file in the source project.
+      // Binary files (images, fonts, etc.) are base64-encoded so the template
+      // is self-contained and assets like logos are preserved.
       const files = await listFiles(PROJECTS_DIR, sourceProjectId, {
         metadata: sourceProject.metadata,
       });
       const snapshot = [];
       for (const f of files) {
-        if (f.kind !== 'html' && f.kind !== 'text' && f.kind !== 'code')
+        if (
+          f.kind !== 'html' &&
+          f.kind !== 'text' &&
+          f.kind !== 'code' &&
+          f.kind !== 'image'
+        )
           continue;
         const entry = await readProjectFile(
           PROJECTS_DIR,
@@ -1774,7 +1783,14 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
           f.name,
           sourceProject.metadata,
         );
-        if (entry && Buffer.isBuffer(entry.buffer)) {
+        if (!entry || !Buffer.isBuffer(entry.buffer)) continue;
+        if (f.kind === 'image') {
+          snapshot.push({
+            name: f.name,
+            content: entry.buffer.toString('base64'),
+            encoding: 'base64',
+          });
+        } else {
           snapshot.push({
             name: f.name,
             content: entry.buffer.toString('utf8'),
