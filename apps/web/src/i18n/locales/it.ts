@@ -2109,6 +2109,8 @@ export const it: Dict = {
   'fileViewer.templateNamePrompt': 'Nome del modello',
   'fileViewer.templateNameDefault': 'Modello senza titolo',
   'fileViewer.templateDescPrompt': 'Breve descrizione (facoltativa — cosa rende utile questo modello?)',
+  'fileViewer.templatePromptLabel': 'Prompt predefinito (facoltativo — compilazione automatica quando si usa questo modello)',
+  'fileViewer.templatePromptPlaceholder': 'Es: Crea una nuova presentazione aziendale basata su questo modello',
   'liveArtifact.refresh.button': 'Aggiorna',
   'liveArtifact.refresh.buttonTitle': 'Aggiorna questo artefatto live',
   'liveArtifact.refresh.loadingTitle': 'Caricamento artifact live…',

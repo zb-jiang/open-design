@@ -2109,6 +2109,8 @@ export const esES: Dict = {
   'fileViewer.templateNamePrompt': 'Nombre de la plantilla',
   'fileViewer.templateNameDefault': 'Plantilla sin título',
   'fileViewer.templateDescPrompt': 'Descripción breve (opcional: ¿qué hace útil esta plantilla?)',
+  'fileViewer.templatePromptLabel': 'Prompt predeterminado (opcional — se rellena automáticamente al usar esta plantilla)',
+  'fileViewer.templatePromptPlaceholder': 'Ej: Crea una nueva presentación de empresa basada en esta plantilla',
   'liveArtifact.refresh.button': 'Actualizar',
   'liveArtifact.refresh.buttonTitle': 'Actualizar este artefacto en vivo',
   'liveArtifact.refresh.loadingTitle': 'Cargando artefacto en vivo…',

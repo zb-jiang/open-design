@@ -2109,6 +2109,8 @@ export const tr: Dict = {
   'fileViewer.templateNamePrompt': 'Şablon ismi',
   'fileViewer.templateNameDefault': 'Başlıksız şablon',
   'fileViewer.templateDescPrompt': 'Kısa açıklama (opsiyonel — bu şablonu kullanışlı yapan ne?)',
+  'fileViewer.templatePromptLabel': 'Varsayılan komut (opsiyonel — bu şablon kullanıldığında giriş kutusuna otomatik doldurulur)',
+  'fileViewer.templatePromptPlaceholder': 'Örn: Bu şablonu temel alarak yeni bir şirket tanıtım sunumu oluşturun',
   'liveArtifact.refresh.button': 'Yenile',
   'liveArtifact.refresh.buttonTitle': 'Bu canlı yapıtı yenile',
   'liveArtifact.refresh.loadingTitle': 'Canlı yapı öğesi yükleniyor…',

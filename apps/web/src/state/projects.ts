@@ -197,6 +197,7 @@ export async function getTemplate(id: string): Promise<ProjectTemplate | null> {
 export async function saveTemplate(input: {
   name: string;
   description?: string;
+  prompt?: string;
   sourceProjectId: string;
 }): Promise<ProjectTemplate | null> {
   try {

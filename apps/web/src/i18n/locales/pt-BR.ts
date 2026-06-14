@@ -2109,6 +2109,8 @@ export const ptBR: Dict = {
   'fileViewer.templateNamePrompt': 'Nome do template',
   'fileViewer.templateNameDefault': 'Template sem título',
   'fileViewer.templateDescPrompt': 'Descrição curta (opcional — o que torna este template útil?)',
+  'fileViewer.templatePromptLabel': 'Prompt padrão (opcional — preenche automaticamente ao usar este template)',
+  'fileViewer.templatePromptPlaceholder': 'Ex: Crie uma nova apresentação de empresa com base neste template',
   'liveArtifact.refresh.button': 'Atualizar',
   'liveArtifact.refresh.buttonTitle': 'Atualizar este artefato ao vivo',
   'liveArtifact.refresh.loadingTitle': 'Carregando artefato ao vivo…',

@@ -2109,6 +2109,8 @@ export const id: Dict = {
   'fileViewer.templateNamePrompt': 'Nama templat',
   'fileViewer.templateNameDefault': 'Templat baru',
   'fileViewer.templateDescPrompt': 'Deskripsi templat',
+  'fileViewer.templatePromptLabel': 'Prompt bawaan (opsional — terisi otomatis saat menggunakan templat ini)',
+  'fileViewer.templatePromptPlaceholder': 'Contoh: Buat presentasi perusahaan baru berdasarkan templat ini',
   'liveArtifact.refresh.button': 'Refresh',
   'liveArtifact.refresh.buttonTitle': 'Refresh live artifact ini',
   'liveArtifact.refresh.loadingTitle': 'Memuat live artifact...',

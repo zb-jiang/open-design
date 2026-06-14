@@ -2109,6 +2109,8 @@ export const pl: Dict = {
   'fileViewer.templateNamePrompt': 'Nazwa szablonu',
   'fileViewer.templateNameDefault': 'Szablon bez tytułu',
   'fileViewer.templateDescPrompt': 'Krótki opis (opcjonalnie — co czyni ten szablon użytecznym?)',
+  'fileViewer.templatePromptLabel': 'Domyślny prompt (opcjonalnie — automatycznie wypełnia pole wprowadzania)',
+  'fileViewer.templatePromptPlaceholder': 'Np. Utwórz nową prezentację firmy na podstawie tego szablonu',
   'liveArtifact.refresh.button': 'Odśwież',
   'liveArtifact.refresh.buttonTitle': 'Odśwież ten dynamiczny artefakt',
   'liveArtifact.refresh.loadingTitle': 'Ładowanie artefaktu na żywo…',

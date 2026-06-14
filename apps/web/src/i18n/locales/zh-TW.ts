@@ -2109,6 +2109,8 @@ export const zhTW: Dict = {
   'fileViewer.templateNamePrompt': '範本名稱',
   'fileViewer.templateNameDefault': '未命名範本',
   'fileViewer.templateDescPrompt': '簡短描述（可選 — 這個範本用於什麼情境？）',
+  'fileViewer.templatePromptLabel': '預設提示詞（可選 — 使用此範本時自動填入輸入框）',
+  'fileViewer.templatePromptPlaceholder': '例如：請基於此範本建立一份新的公司介紹簡報',
   'liveArtifact.refresh.button': '重新整理',
   'liveArtifact.refresh.buttonTitle': '刷新此即時看板',
   'liveArtifact.refresh.loadingTitle': '正在載入即時看板…',

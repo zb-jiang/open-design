@@ -2109,6 +2109,8 @@ export const zhCN: Dict = {
   'fileViewer.templateNamePrompt': '模板名称',
   'fileViewer.templateNameDefault': '未命名模板',
   'fileViewer.templateDescPrompt': '简短描述（可选 — 这个模板用于什么场景？）',
+  'fileViewer.templatePromptLabel': '默认提示词（可选 — 使用此模板时自动填入输入框）',
+  'fileViewer.templatePromptPlaceholder': '例如：请基于此模板创建一份新的公司介绍PPT',
   'liveArtifact.refresh.button': '刷新',
   'liveArtifact.refresh.buttonTitle': '刷新此实时看板',
   'liveArtifact.refresh.loadingTitle': '正在加载实时看板…',

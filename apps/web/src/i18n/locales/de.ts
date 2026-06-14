@@ -2109,6 +2109,8 @@ export const de: Dict = {
   'fileViewer.templateNamePrompt': 'Template-Name',
   'fileViewer.templateNameDefault': 'Template ohne Titel',
   'fileViewer.templateDescPrompt': 'Kurze Beschreibung (optional — was macht dieses Template nützlich?)',
+  'fileViewer.templatePromptLabel': 'Standard-Prompt (optional — wird beim Verwenden dieses Templates automatisch ausgefüllt)',
+  'fileViewer.templatePromptPlaceholder': 'Z. B. Erstellen Sie eine neue Firmenpräsentation basierend auf diesem Template',
   'liveArtifact.refresh.button': 'Aktualisieren',
   'liveArtifact.refresh.buttonTitle': 'Dieses Live-Artefakt aktualisieren',
   'liveArtifact.refresh.loadingTitle': 'Live-Artefakt wird geladen…',

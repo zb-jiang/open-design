@@ -555,10 +555,14 @@ export function EntryShell({
     // single row without touching the form.
     const pluginId = defaultPluginIdForMetadata(input.metadata);
     const pluginInputs = defaultPluginInputsForCreate(input, pluginId);
+    // If the template has a default prompt, pass it as pendingPrompt
+    // so it fills the input box when the project opens.
+    const templatePrompt = (input.metadata as unknown as Record<string, unknown>)?.templatePrompt as string | undefined;
     return onCreateProject({
       ...input,
       ...(pluginId ? { pluginId } : {}),
       ...(pluginInputs ? { pluginInputs } : {}),
+      ...(templatePrompt ? { pendingPrompt: templatePrompt } : {}),
     });
   }
 

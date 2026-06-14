@@ -2109,6 +2109,8 @@ export const ru: Dict = {
   'fileViewer.templateNamePrompt': 'Название шаблона',
   'fileViewer.templateNameDefault': 'Шаблон без названия',
   'fileViewer.templateDescPrompt': 'Краткое описание (необязательно — чем полезен этот шаблон?)',
+  'fileViewer.templatePromptLabel': 'Запрос по умолчанию (необязательно — автоматически заполняет поле ввода)',
+  'fileViewer.templatePromptPlaceholder': 'Например: Создайте новую презентацию компании на основе этого шаблона',
   'liveArtifact.refresh.button': 'Обновить',
   'liveArtifact.refresh.buttonTitle': 'Обновить этот live-артефакт',
   'liveArtifact.refresh.loadingTitle': 'Загрузка live-артефакта…',

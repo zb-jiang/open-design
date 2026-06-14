@@ -2674,6 +2674,8 @@ export interface Dict {
   'fileViewer.templateNamePrompt': string;
   'fileViewer.templateNameDefault': string;
   'fileViewer.templateDescPrompt': string;
+  'fileViewer.templatePromptLabel': string;
+  'fileViewer.templatePromptPlaceholder': string;
   'liveArtifact.refresh.button': string;
   'liveArtifact.refresh.buttonTitle': string;
   'liveArtifact.refresh.loadingTitle': string;

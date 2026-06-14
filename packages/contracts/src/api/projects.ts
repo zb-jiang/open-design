@@ -197,6 +197,7 @@ export interface ProjectTemplate {
   sourceProjectId?: string;
   files: Array<{ name: string; content: string }>;
   description?: string;
+  prompt?: string;
   createdAt: number;
 }
 

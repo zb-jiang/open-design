@@ -2975,6 +2975,7 @@ function buildMetadata(input: {
       animations: input.animations,
       templateId: input.templateId,
       templateLabel: tpl?.name ?? 'Saved template',
+      ...(tpl?.prompt ? { templatePrompt: tpl.prompt } : {}),
       ...inspirations,
     };
   }

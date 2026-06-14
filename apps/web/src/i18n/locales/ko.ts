@@ -2109,6 +2109,8 @@ export const ko: Dict = {
   'fileViewer.templateNamePrompt': '템플릿 이름',
   'fileViewer.templateNameDefault': '제목 없는 템플릿',
   'fileViewer.templateDescPrompt': '간단한 설명 (선택 사항 — 이 템플릿의 용도나 특징이 무엇인가요?)',
+  'fileViewer.templatePromptLabel': '기본 프롬프트 (선택 사항 — 이 템플릿 사용 시 입력란에 자동 채움)',
+  'fileViewer.templatePromptPlaceholder': '예: 이 템플릿을 기반으로 새로운 회사 소개 프레젠테이션을 만들어 주세요',
   'liveArtifact.refresh.button': '새로 고침',
   'liveArtifact.refresh.buttonTitle': '이 라이브 아티팩트 새로 고침',
   'liveArtifact.refresh.loadingTitle': '라이브 아티팩트 로딩 중…',

@@ -320,6 +320,10 @@ function migrate(db: SqliteDb): void {
   if (!deploymentCols.some((c: DbRow) => c.name === 'reachable_at')) {
     db.exec(`ALTER TABLE deployments ADD COLUMN reachable_at INTEGER`);
   }
+  const templateCols = db.prepare(`PRAGMA table_info(templates)`).all() as DbRow[];
+  if (templateCols.length > 0 && !templateCols.some((c: DbRow) => c.name === 'prompt')) {
+    db.exec(`ALTER TABLE templates ADD COLUMN prompt TEXT`);
+  }
   if (!deploymentCols.some((c: DbRow) => c.name === 'provider_metadata_json')) {
     db.exec(`ALTER TABLE deployments ADD COLUMN provider_metadata_json TEXT`);
   }
@@ -743,7 +747,7 @@ function normalizeProjectRunStatus(status: unknown) {
 export function listTemplates(db: SqliteDb) {
   return (db
     .prepare(
-      `SELECT id, name, description, source_project_id AS sourceProjectId,
+      `SELECT id, name, description, prompt, source_project_id AS sourceProjectId,
               files_json AS filesJson, created_at AS createdAt
          FROM templates
         ORDER BY created_at DESC`,
@@ -755,7 +759,7 @@ export function listTemplates(db: SqliteDb) {
 export function getTemplate(db: SqliteDb, id: string) {
   const row = db
     .prepare(
-      `SELECT id, name, description, source_project_id AS sourceProjectId,
+      `SELECT id, name, description, prompt, source_project_id AS sourceProjectId,
               files_json AS filesJson, created_at AS createdAt
          FROM templates WHERE id = ?`,
     )
@@ -770,7 +774,7 @@ export function findTemplateByNameAndProject(
 ) {
   const row = db
     .prepare(
-      `SELECT id, name, description, source_project_id AS sourceProjectId,
+      `SELECT id, name, description, prompt, source_project_id AS sourceProjectId,
               files_json AS filesJson, created_at AS createdAt
          FROM templates
         WHERE name = ? AND source_project_id = ?`,
@@ -781,12 +785,13 @@ export function findTemplateByNameAndProject(
 
 export function insertTemplate(db: SqliteDb, t: DbRow) {
   db.prepare(
-    `INSERT INTO templates (id, name, description, source_project_id, files_json, created_at)
-     VALUES (?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO templates (id, name, description, prompt, source_project_id, files_json, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
   ).run(
     t.id,
     t.name,
     t.description ?? null,
+    t.prompt ?? null,
     t.sourceProjectId ?? null,
     JSON.stringify(t.files ?? []),
     t.createdAt,
@@ -797,11 +802,11 @@ export function insertTemplate(db: SqliteDb, t: DbRow) {
 export function updateTemplate(
   db: SqliteDb,
   id: string,
-  t: { description: string | null; files: unknown[] },
+  t: { description: string | null; prompt: string | null; files: unknown[] },
 ) {
   db.prepare(
-    `UPDATE templates SET description = ?, files_json = ? WHERE id = ?`,
-  ).run(t.description, JSON.stringify(t.files), id);
+    `UPDATE templates SET description = ?, prompt = ?, files_json = ? WHERE id = ?`,
+  ).run(t.description, t.prompt, JSON.stringify(t.files), id);
   return getTemplate(db, id);
 }
 
@@ -820,6 +825,7 @@ function normalizeTemplate(row: DbRow) {
     id: row.id,
     name: row.name,
     description: row.description ?? undefined,
+    prompt: row.prompt ?? undefined,
     sourceProjectId: row.sourceProjectId ?? undefined,
     files,
     createdAt: Number(row.createdAt),

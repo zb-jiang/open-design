@@ -2109,6 +2109,8 @@ export const en: Dict = {
   'fileViewer.templateNamePrompt': 'Template name',
   'fileViewer.templateNameDefault': 'Untitled template',
   'fileViewer.templateDescPrompt': 'Short description (optional — what makes this template useful?)',
+  'fileViewer.templatePromptLabel': 'Default prompt (optional — auto-fills the input when using this template)',
+  'fileViewer.templatePromptPlaceholder': 'e.g. Create a new company intro deck based on this template',
   'liveArtifact.refresh.button': 'Refresh',
   'liveArtifact.refresh.buttonTitle': 'Refresh this live artifact',
   'liveArtifact.refresh.loadingTitle': 'Loading live artifact…',

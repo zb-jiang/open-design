@@ -2109,6 +2109,8 @@ export const th: Dict = {
   'fileViewer.templateNamePrompt': 'ระบุชื่อตัวเทมเพลต',
   'fileViewer.templateNameDefault': 'แม่แบบว่างไม่มีการระบุชื่อ',
   'fileViewer.templateDescPrompt': 'อธิบายลักษณะเพิ่มเติม (ไม่จำเป็นต้องใส่เลยก็ได้ — แต่มีก็ดีต่อความเข้าใจในครั้งหน้า)',
+  'fileViewer.templatePromptLabel': 'ข้อความเริ่มต้น (ไม่จำเป็น — กรอกอัตโนมัติเมื่อใช้เทมเพลตนี้)',
+  'fileViewer.templatePromptPlaceholder': 'เช่น สร้างงานนำเสนอแนะนำบริษัทใหม่จากเทมเพลตนี้',
   'liveArtifact.refresh.button': 'ดึงค่าเริ่มระบบอีกหน',
   'liveArtifact.refresh.buttonTitle': 'รีค่าการทำตัว Live artifact ใหม่',
   'liveArtifact.refresh.loadingTitle': 'ขอเวลาเพื่อดึงของ Live artifact…',

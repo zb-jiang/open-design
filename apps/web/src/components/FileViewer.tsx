@@ -4616,6 +4616,7 @@ function HtmlViewer({
     setPreviewViewportState(htmlPreviewViewportState.get(fileViewportKey) ?? 'desktop');
   }, [fileViewportKey]);
   const [templateDescription, setTemplateDescription] = useState('');
+  const [templatePrompt, setTemplatePrompt] = useState('');
   const [templateSaveError, setTemplateSaveError] = useState<string | null>(null);
   const [deployment, setDeployment] = useState<WebDeploymentInfo | null>(null);
   const [deploymentsByProvider, setDeploymentsByProvider] = useState<Partial<Record<WebDeployProviderId, WebDeploymentInfo>>>({});
@@ -4839,6 +4840,7 @@ function HtmlViewer({
   const sourceFileKeyRef = useRef<string | null>(null);
   const templateNameId = useId();
   const templateDescriptionId = useId();
+  const templatePromptId = useId();
   const imageExportTitleId = useId();
   // Opt back into the legacy inline-asset srcDoc path via `?forceInline=1`
   // on the host page. Lets users escape-hatch around the URL-load default
@@ -6583,6 +6585,7 @@ function HtmlViewer({
       file.name.replace(/\.html?$/i, '') || t('fileViewer.templateNameDefault');
     setTemplateName(defaultName);
     setTemplateDescription('');
+    setTemplatePrompt('');
     setTemplateSaveError(null);
     setTemplateModalOpen(true);
   }
@@ -6598,6 +6601,7 @@ function HtmlViewer({
       const tpl = await saveTemplate({
         name,
         description: templateDescription.trim() || undefined,
+        prompt: templatePrompt.trim() || undefined,
         sourceProjectId: projectId,
       });
       if (!tpl) {
@@ -8931,6 +8935,16 @@ function HtmlViewer({
                   value={templateDescription}
                   placeholder={t('fileViewer.optional')}
                   onChange={(e) => setTemplateDescription(e.target.value)}
+                />
+              </label>
+              <label className="field" htmlFor={templatePromptId}>
+                <span className="field-label">{t('fileViewer.templatePromptLabel')}</span>
+                <textarea
+                  id={templatePromptId}
+                  rows={3}
+                  value={templatePrompt}
+                  placeholder={t('fileViewer.templatePromptPlaceholder')}
+                  onChange={(e) => setTemplatePrompt(e.target.value)}
                 />
               </label>
               {templateSaveError ? <p className="deploy-error">{templateSaveError}</p> : null}

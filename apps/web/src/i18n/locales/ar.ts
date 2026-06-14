@@ -2109,6 +2109,8 @@ export const ar: Dict = {
   'fileViewer.templateNamePrompt': 'اسم القالب',
   'fileViewer.templateNameDefault': 'قالب بدون عنوان',
   'fileViewer.templateDescPrompt': 'وصف قصير (اختياري - ما الذي يجعل هذا القالب مفيداً؟)',
+  'fileViewer.templatePromptLabel': 'الموجه الافتراضي (اختياري — يُملأ تلقائياً عند استخدام هذا القالب)',
+  'fileViewer.templatePromptPlaceholder': 'مثال: أنشئ عرضاً تقديمياً جديداً لتعريف الشركة بناءً على هذا القالب',
   'liveArtifact.refresh.button': 'تحديث',
   'liveArtifact.refresh.buttonTitle': 'تحديث هذا العنصر المباشر',
   'liveArtifact.refresh.loadingTitle': 'جارٍ تحميل المُخرَج الحي…',

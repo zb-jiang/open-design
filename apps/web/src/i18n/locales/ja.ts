@@ -2109,6 +2109,8 @@ export const ja: Dict = {
   'fileViewer.templateNamePrompt': 'テンプレート名',
   'fileViewer.templateNameDefault': '無題のテンプレート',
   'fileViewer.templateDescPrompt': '短い説明（省略可 — このテンプレートの使いどころは？）',
+  'fileViewer.templatePromptLabel': 'デフォルトプロンプト（省略可 — このテンプレート使用時に入力欄に自動入力）',
+  'fileViewer.templatePromptPlaceholder': '例：このテンプレートをベースに新しい会社紹介プレゼンを作成してください',
   'liveArtifact.refresh.button': '更新',
   'liveArtifact.refresh.buttonTitle': 'このライブアーティファクトを更新',
   'liveArtifact.refresh.loadingTitle': 'ライブアーティファクトを読み込み中…',

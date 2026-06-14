@@ -2109,6 +2109,8 @@ export const fa: Dict = {
   'fileViewer.templateNamePrompt': 'نام قالب',
   'fileViewer.templateNameDefault': 'قالب بدون عنوان',
   'fileViewer.templateDescPrompt': 'توضیح کوتاه (اختیاری — چه چیزی این قالب را مفید می‌کند؟)',
+  'fileViewer.templatePromptLabel': 'پرامپت پیش‌فرض (اختیاری — هنگام استفاده از این قالب، خودکار پر می‌شود)',
+  'fileViewer.templatePromptPlaceholder': 'مثال: یک ارائه معرفی شرکت جدید بر اساس این قالب بسازید',
   'liveArtifact.refresh.button': 'بازخوانی',
   'liveArtifact.refresh.buttonTitle': 'این مصنوع زنده را بازخوانی کن',
   'liveArtifact.refresh.loadingTitle': 'در حال بارگذاری مصنوع زنده…',

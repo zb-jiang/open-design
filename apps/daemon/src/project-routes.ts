@@ -1748,7 +1748,7 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
 
   app.post('/api/templates', async (req, res) => {
     try {
-      const { name, description, sourceProjectId } = req.body || {};
+      const { name, description, prompt, sourceProjectId } = req.body || {};
       if (typeof name !== 'string' || !name.trim()) {
         return res.status(400).json({ error: 'name required' });
       }
@@ -1799,11 +1799,13 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
       }
       const trimmedName = name.trim();
       const descValue = typeof description === 'string' ? description : null;
+      const promptValue = typeof prompt === 'string' ? prompt : null;
       const existing = findTemplateByNameAndProject(db, trimmedName, sourceProjectId);
       let t;
       if (existing) {
         t = updateTemplate(db, existing.id, {
           description: descValue,
+          prompt: promptValue,
           files: snapshot,
         });
       } else {
@@ -1811,6 +1813,7 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
           id: randomId(),
           name: trimmedName,
           description: descValue,
+          prompt: promptValue,
           sourceProjectId,
           files: snapshot,
           createdAt: Date.now(),

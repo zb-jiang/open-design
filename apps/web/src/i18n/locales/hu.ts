@@ -2109,6 +2109,8 @@ export const hu: Dict = {
   'fileViewer.templateNamePrompt': 'Sablon neve',
   'fileViewer.templateNameDefault': 'Cím nélküli sablon',
   'fileViewer.templateDescPrompt': 'Rövid leírás (opcionális — mitől hasznos ez a sablon?)',
+  'fileViewer.templatePromptLabel': 'Alapértelmezett prompt (opcionális — automatikusan kitölti a beviteli mezőt)',
+  'fileViewer.templatePromptPlaceholder': 'Pl. Készítsen új cégbemutató prezentációt ezen sablon alapján',
   'liveArtifact.refresh.button': 'Frissítés',
   'liveArtifact.refresh.buttonTitle': 'Ennek az élő tartalomnak a frissítése',
   'liveArtifact.refresh.loadingTitle': 'Élő artifact betöltése…',
